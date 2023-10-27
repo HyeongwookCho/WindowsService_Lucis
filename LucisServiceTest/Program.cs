@@ -106,7 +106,7 @@ namespace ConsoleApp1
         {
             DateTime dateTime = DateTime.Now;
             string timeCheck = dateTime.ToString("mm");
-            return int.Parse(timeCheck) % 2 == 0;
+            return int.Parse(timeCheck) % 5 == 0;
         }
         private static bool SecondTimeChecker()
         {
@@ -131,7 +131,7 @@ namespace ConsoleApp1
         {
             timer = new Timer(obj =>
             {
-                Console.WriteLine("2분 단위 체크");
+                Console.WriteLine("5분 단위 체크");
                 if (MinuteTimeChecker())
                 {
                     BatchProcess();
@@ -139,7 +139,7 @@ namespace ConsoleApp1
             },
             null,
             TimeSpan.Zero,
-            TimeSpan.FromSeconds(1)); // 30초마다 체크
+            TimeSpan.FromSeconds(1));
         }
 
         //TimeSpan의 주기적 반복을 이용하는 방법은 mili 단위 초가 조금씩 밀리기 때문에 지속적으로 했을 시 부정확해질 가능성이 높다.
@@ -158,6 +158,8 @@ namespace ConsoleApp1
             TimeSpan.FromMinutes(1));
         }*/
 
+
+        //commit test
     }
 
 }
