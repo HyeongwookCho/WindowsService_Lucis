@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.34114.132
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LucisServiceTest", "LucisServiceTest\LucisServiceTest.csproj", "{A92BBA50-A45C-4030-A4B0-5053457A51E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A92BBA50-A45C-4030-A4B0-5053457A51E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A92BBA50-A45C-4030-A4B0-5053457A51E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A92BBA50-A45C-4030-A4B0-5053457A51E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A92BBA50-A45C-4030-A4B0-5053457A51E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {387E9E43-49D6-4AA8-B251-B8461F0E653B}
+	EndGlobalSection
+EndGlobal
