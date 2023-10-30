@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Timers;
 using System.Threading;
 
 namespace ConsoleApp1
@@ -30,12 +31,16 @@ namespace ConsoleApp1
         #region [전역 변수]
         protected static PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         protected static PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Available MBytes");
-        private static Timer timer;
+        private static System.Threading.Timer timer;
         #endregion
 
         static void Main(string[] args)
         {
             ReadyToStart();
+            /*timer = new System.Timers.Timer();
+            timer.Interval = 1000;
+            timer.Elapsed += new ElapsedEventHandler(ReadyToStart);
+            timer.Start();*/
             Console.ReadLine();
         }
         // 수집된 리소스 기록 메서드
@@ -93,7 +98,7 @@ namespace ConsoleApp1
             }
             // 3. CPU 사용률
             CPUCounter.NextValue();
-            System.Threading.Thread.Sleep(1000);
+            Thread.Sleep(500); //4초간 cpu 사용률 측정 thread safe를 위해 TimeSpan의 period Time 보다 작게 설정
             resource.CPUInfo = CPUCounter.NextValue().ToString() + "%";
 
             // 4. Memory 사용량
@@ -106,16 +111,16 @@ namespace ConsoleApp1
         {
             DateTime dateTime = DateTime.Now;
             string timeCheck = dateTime.ToString("mm");
-            return int.Parse(timeCheck) % 5 == 0;
+            return int.Parse(timeCheck) % 2 == 0;
         }
-        private static bool SecondTimeChecker()
+        /*private static bool SecondTimeChecker()
         {
             DateTime dateTime = DateTime.Now;
             string timeCheck = dateTime.ToString("ss");
             return int.Parse(timeCheck) == 0;
-        }
+        }*/
         // 이 구조가 최선일까..?
-        private static void BatchProcess()
+        /*private static void BatchProcess()
         {
             Console.WriteLine("BatchProcess called");
             if (SecondTimeChecker())
@@ -126,12 +131,20 @@ namespace ConsoleApp1
             {
                 Console.WriteLine("SecondTimeChecker returned false");
             }
-        }
-        private static void ReadyToStart()
+        }*/
+        /*private static void ReadyToStart(object sender, ElapsedEventArgs e)
         {
-            timer = new Timer(obj =>
+            Console.WriteLine($"5분 단위 체크 \t []Thread ID Check: " + System.Threading.Thread.CurrentThread.ManagedThreadId.ToString());
+            if (MinuteTimeChecker())
             {
-                Console.WriteLine("5분 단위 체크");
+                BatchProcess();
+            }
+        }*/
+        private static void ReadyToStart()
+        {           
+            timer = new System.Threading.Timer(obj =>
+            {
+                Console.WriteLine($"정시 5분 인지 checking... \t []Thread ID Check: " + System.Threading.Thread.CurrentThread.ManagedThreadId.ToString());
                 if (MinuteTimeChecker())
                 {
                     BatchProcess();
@@ -141,25 +154,18 @@ namespace ConsoleApp1
             TimeSpan.Zero,
             TimeSpan.FromSeconds(1));
         }
-
         //TimeSpan의 주기적 반복을 이용하는 방법은 mili 단위 초가 조금씩 밀리기 때문에 지속적으로 했을 시 부정확해질 가능성이 높다.
-        /*private static void BatchProcess()
+        private static void BatchProcess()
         {
             timer.Dispose(); // 기존 타이머 종료
 
-            timer = new Timer(obj =>
+            timer = new System.Threading.Timer(obj =>
             {
-                
-                 PrintResource();
-                
+                PrintResource();
             },
             null,
             TimeSpan.Zero,
-            TimeSpan.FromMinutes(1));
-        }*/
-
-
-        //commit test
-    }
-
+            TimeSpan.FromMinutes(5));
+        }
+    }        
 }
