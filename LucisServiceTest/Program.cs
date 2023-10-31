@@ -7,6 +7,9 @@ using System.Net;
 using System.Text;
 using System.Timers;
 using System.Threading;
+using Quartz;
+using Quartz.Impl;
+using LucisServiceTest;
 
 namespace ConsoleApp1
 {
@@ -32,16 +35,47 @@ namespace ConsoleApp1
         protected static PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         protected static PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Available MBytes");
         private static System.Threading.Timer timer;
+        static StdSchedulerFactory factory;
+        static IScheduler scheduler;
         #endregion
 
         static void Main(string[] args)
         {
-            ReadyToStart();
+            fScheduler();
+            //ReadyToStart();
             /*timer = new System.Timers.Timer();
             timer.Interval = 1000;
             timer.Elapsed += new ElapsedEventHandler(ReadyToStart);
             timer.Start();*/
             Console.ReadLine();
+        }
+        public static async void fScheduler()
+        {
+            factory = new StdSchedulerFactory();
+            scheduler = await factory.GetScheduler();
+            await scheduler.Start();
+
+            // define the job and tie it to our HelloJob class
+            IJobDetail job = JobBuilder.Create<CollectResource>()
+                .WithIdentity("job1", "group1")
+                .Build();
+
+            // Trigger the job to run now, and then repeat every 10 seconds
+            ITrigger trigger = TriggerBuilder.Create()
+                .WithIdentity("trigger1", "group1")
+                .StartNow()
+                .WithCronSchedule("0 0/2 * 1/1 * ? *")
+                /*.WithSimpleSchedule(x => x
+                    .WithIntervalInSeconds(10)
+                    .RepeatForever())*/
+                .Build();
+
+            // Tell Quartz to schedule the job using our trigger
+            await scheduler.ScheduleJob(job, trigger);
+        }
+        public void scStop()
+        {
+
         }
         // 수집된 리소스 기록 메서드
         private static void PrintResource()
