@@ -1,4 +1,4 @@
-﻿using ConsoleApp1;
+﻿using LucisService;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -9,35 +9,40 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static LucisService.Log;
 
-namespace LucisServiceTest
+namespace LucisService
 {
-    class CollectResource : IJob
+    class Job : IJob
     {
-        protected static PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-        protected static PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Available MBytes");
-
+        #region [전역변수]
+        protected PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+        protected PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Available MBytes");        
         public async Task Execute(IJobExecutionContext context)
         {
             await PrintResource();
         }
+        #endregion
+
+        #region [Collect System Resource]
         // 수집된 리소스 기록 메서드
-        private static Task PrintResource()
+        private Task PrintResource()
         {
             // =============리소스 수집 시작=============
             DateTime startTime = DateTime.Now;
-            string format = "yyyy-MM-dd HH.mm.ss.fff";
-            string strStartTime = startTime.ToString(format);
+            string timeFormat = "yyyy-MM-dd HH.mm.ss.fff";
+                        
+            string strStartTime = startTime.ToString(timeFormat);
             SystemResource systemResource = new SystemResource();
             systemResource = GetSystemResource();
 
-            Console.WriteLine("==============================================");
-            Console.WriteLine("============System Resource===================");
-            Console.WriteLine("==============================================");
-            DateTime loggingTime = DateTime.Now;
+            DateTime loggingTime = DateTime.Now;            
+            string strLoggingTime = loggingTime.ToString(timeFormat);
+            
+            Log log = new Log();
             for (int i = 0; i < systemResource.driveInfo.Count; i++)
-            {
-                Console.WriteLine($"[{loggingTime.ToString(format)}]" // 로그 기록 시간
+            {                
+                string logMessage = ($"[{strLoggingTime}]" // 로그 기록 시간
                     + "ServerHostName: " + systemResource.ServerName + " | "
                     + "DriveName: " + systemResource.driveInfo[i].Name + " / " // 드라이브명
                     + "TotalDiskSize: " + systemResource.driveInfo[i].TotalSize + " / " // 전체 디스크 크기
@@ -46,15 +51,13 @@ namespace LucisServiceTest
                     + "CPUUsageRatio: " + systemResource.CPUInfo + " | " // CPU 사용률
                     + "MemoryUsage: " + systemResource.MemoryInfo + " | " // 메모리 사용량
                     + "StartTime: " + strStartTime); // 수집을 시작한 시간
+                Log.WriteLog(logMessage);
             }
-            Console.WriteLine("==============================================");
-            Console.WriteLine("==============================================");
-            Console.WriteLine("==============================================");
             return Task.CompletedTask;
         }
 
         //시스템 리소스 수집 메서드
-        private static SystemResource GetSystemResource()
+        private SystemResource GetSystemResource()
         {
             SystemResource resource = new SystemResource();
 
@@ -86,5 +89,7 @@ namespace LucisServiceTest
 
             return resource;
         }
+        #endregion
+       
     }
 }
