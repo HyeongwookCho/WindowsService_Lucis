@@ -12,53 +12,73 @@ using Quartz;
 using Quartz.Impl;
 
 namespace LucisService
-{    
+{
     public partial class Service1 : ServiceBase
     {
         #region [전역 변수] 
         private DateTime dateTime = DateTime.Now;
-        private string timeFormat = "yyyy-MM-dd HH.mm.ss.fff";              
+        private string timeFormat = "yyyy-MM-dd HH.mm.ss.fff";
         StdSchedulerFactory factory;
         IScheduler scheduler;
         #endregion
 
         public Service1()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         protected override void OnStart(string[] args)
         {
-            // 시작 시 수집 시작 로그 기록
-            Log.WriteLog($"[{dateTime.ToString(timeFormat)}] Start Collect System Resource!");
-            fScheduler();
+            try
+            {
+                // 시작 시 수집 시작 로그 기록
+                Log.WriteLog($"[{dateTime.ToString(timeFormat)}] Start Collect System Resource!");
+                fScheduler();
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("LucisService", ex.Message, EventLogEntryType.Error);
+            }
         }
 
         protected override void OnStop()
         {
-            // 중단 시 수집 중단 로그 기록
-            Log.WriteLog($"[{dateTime.ToString(timeFormat)}] Stop Collect System Resource!");
-                  
+            try
+            {
+                // 중단 시 수집 중단 로그 기록
+                Log.WriteLog($"[{dateTime.ToString(timeFormat)}] Stop Collect System Resource!");
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("LucisService", ex.Message, EventLogEntryType.Error);
+            }
         }
 
         #region [scheduling method]
         public async void fScheduler()
         {
-            factory = new StdSchedulerFactory();
-            scheduler = await factory.GetScheduler();
-            await scheduler.Start();
+            try
+            {
+                factory = new StdSchedulerFactory();
+                scheduler = await factory.GetScheduler();
+                await scheduler.Start();
 
-            IJobDetail job = JobBuilder.Create<Job>()
-                .WithIdentity("job1", "group1")
-                .Build();
+                IJobDetail job = JobBuilder.Create<Job>()
+                    .WithIdentity("job1", "group1")
+                    .Build();
 
-            ITrigger trigger = TriggerBuilder.Create()
-                .WithIdentity("trigger1", "group1")
-                .StartNow()
-                .WithCronSchedule("0 0/5 * 1/1 * ? *")
-                .Build();
+                ITrigger trigger = TriggerBuilder.Create()
+                    .WithIdentity("trigger1", "group1")
+                    .StartNow()
+                    .WithCronSchedule("0 0/5 * 1/1 * ? *")
+                    .Build();
 
-            await scheduler.ScheduleJob(job, trigger);
+                await scheduler.ScheduleJob(job, trigger);
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("LucisService", ex.Message, EventLogEntryType.Error);
+            }
         }
         #endregion
     }
@@ -73,6 +93,7 @@ namespace LucisService
     public class SystemResource
     {
         public string ServerName { get; set; }
+
         public List<DriveInfoDetail> driveInfo = new List<DriveInfoDetail>();
         public string CPUInfo { get; set; }
         public string MemoryInfo { get; set; }
