@@ -52,14 +52,13 @@ namespace LucisService
         #endregion
 
         #region [create / read config&directory path]
-        #region [create / read config&directory path]
         private static string GetDirectoryPathFromConfig()
         {
             try
             {
                 if (!File.Exists(configFilePath))
                 {
-                    File.WriteAllText(configFilePath, JsonConvert.SerializeObject(DefaultDirectory()));
+                    File.WriteAllText(configFilePath, JsonConvert.SerializeObject(GetDefaultDrive()));
                 }
                 string json = File.ReadAllText(configFilePath);
                 return JsonConvert.DeserializeObject<string>(json);
@@ -87,18 +86,6 @@ namespace LucisService
                 EventLog.WriteEntry("LucisService", ex.Message, EventLogEntryType.Error);
                 throw;
             }
-        }
-        #endregion
-
-        private static string DefaultDirectory()
-        {
-            DirectoryInfo directoryInfo = new DirectoryInfo(GetDefaultDrive());
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
-            return directoryInfo.FullName;
         }
         #endregion
     }

@@ -16,7 +16,7 @@ namespace LucisService
     public partial class Service1 : ServiceBase
     {
         #region [전역 변수] 
-        private DateTime dateTime = DateTime.Now;
+        
         private string timeFormat = "yyyy-MM-dd HH.mm.ss.fff";
         StdSchedulerFactory factory;
         IScheduler scheduler;
@@ -29,10 +29,11 @@ namespace LucisService
 
         protected override void OnStart(string[] args)
         {
+            DateTime onStartTime = DateTime.Now;
             try
             {
                 // 시작 시 수집 시작 로그 기록
-                Log.WriteLog($"[{dateTime.ToString(timeFormat)}] Start Collect System Resource!");
+                Log.WriteLog($"[{onStartTime.ToString(timeFormat)}] Start Collect System Resource!");
                 fScheduler();
             }
             catch (Exception ex)
@@ -43,10 +44,11 @@ namespace LucisService
 
         protected override void OnStop()
         {
+            DateTime onStopTime = DateTime.Now;
             try
             {
                 // 중단 시 수집 중단 로그 기록
-                Log.WriteLog($"[{dateTime.ToString(timeFormat)}] Stop Collect System Resource!");
+                Log.WriteLog($"[{onStopTime.ToString(timeFormat)}] Stop Collect System Resource!");
             }
             catch (Exception ex)
             {
@@ -82,21 +84,5 @@ namespace LucisService
         }
         #endregion
     }
-    #region [시스템 리소스 참조 클래스]
-    public class DriveInfoDetail
-    {
-        public string Name { get; set; }
-        public long TotalSize { get; set; }
-        public long CurrentUsage { get; set; }
-        public double UsageRatio { get; set; }
-    }
-    public class SystemResource
-    {
-        public string ServerName { get; set; }
-
-        public List<DriveInfoDetail> driveInfo = new List<DriveInfoDetail>();
-        public string CPUInfo { get; set; }
-        public string MemoryInfo { get; set; }
-    }
-    #endregion
+    
 }

@@ -1,5 +1,4 @@
-﻿using LucisService;
-using Quartz;
+﻿using Quartz;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,11 +12,33 @@ using static LucisService.Log;
 
 namespace LucisService
 {
+    #region [시스템 리소스 참조 클래스]
+    public class DriveInfoDetail
+    {
+        public string Name { get; set; }
+        public long TotalSize { get; set; }
+        public long CurrentUsage { get; set; }
+        public double UsageRatio { get; set; }
+    }
+    public class SystemResource
+    {
+        public string ServerName { get; set; }
+
+        public List<DriveInfoDetail> driveInfo = new List<DriveInfoDetail>();
+        public string CPUInfo { get; set; }
+        public string MemoryInfo { get; set; }
+    }
+    #endregion
     class Job : IJob
     {
         #region [전역변수]
         protected PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-        protected PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Available MBytes");
+        protected PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Committed Bytes");
+        #endregion
+
+
+
+        #region [Collect System Resource]
         public async Task Execute(IJobExecutionContext context)
         {
             try
@@ -29,9 +50,7 @@ namespace LucisService
                 EventLog.WriteEntry("LucisService", ex.Message, EventLogEntryType.Error);
             }
         }
-        #endregion
 
-        #region [Collect System Resource]
         // 수집된 리소스 기록 메서드
         private Task PrintResource()
         {
@@ -48,7 +67,6 @@ namespace LucisService
                 DateTime loggingTime = DateTime.Now;
                 string strLoggingTime = loggingTime.ToString(timeFormat);
 
-                Log log = new Log();
                 for (int i = 0; i < systemResource.driveInfo.Count; i++)
                 {
                     string logMessage = ($"[{strLoggingTime}]" // 로그 기록 시간
@@ -61,7 +79,7 @@ namespace LucisService
                         + "MemoryUsage: " + systemResource.MemoryInfo + " | " // 메모리 사용량
                         + "StartTime: " + strStartTime); // 수집을 시작한 시간
                     Log.WriteLog(logMessage);
-                }
+                }                
                 return Task.CompletedTask;
             }
             catch (Exception ex)
@@ -102,7 +120,7 @@ namespace LucisService
                 resource.CPUInfo = CPUCounter.NextValue().ToString() + "%";
 
                 // 4. Memory 사용량
-                resource.MemoryInfo = (MemoryCounter.NextValue() * 1024 * 1024).ToString() + "Bytes";
+                resource.MemoryInfo = MemoryCounter.NextValue().ToString() + " Bytes";
 
                 return resource;
             }

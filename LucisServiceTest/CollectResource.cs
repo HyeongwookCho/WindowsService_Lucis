@@ -15,7 +15,7 @@ namespace LucisServiceTest
     class CollectResource : IJob
     {
         protected static PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-        protected static PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Available MBytes");
+        protected static PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Committed Bytes");
 
         public async Task Execute(IJobExecutionContext context)
         {
@@ -34,11 +34,14 @@ namespace LucisServiceTest
             Console.WriteLine("==============================================");
             Console.WriteLine("============System Resource===================");
             Console.WriteLine("==============================================");
+
             DateTime loggingTime = DateTime.Now;
+
             for (int i = 0; i < systemResource.driveInfo.Count; i++)
             {
+                
                 Console.WriteLine($"[{loggingTime.ToString(format)}]" // 로그 기록 시간
-                    + "ServerHostName: " + systemResource.ServerName + " | "
+                    + "ServerHostName: " + systemResource.ServerName + " | " // 서버 호스트명
                     + "DriveName: " + systemResource.driveInfo[i].Name + " / " // 드라이브명
                     + "TotalDiskSize: " + systemResource.driveInfo[i].TotalSize + " / " // 전체 디스크 크기
                     + "CurrentDiskUsage: " + systemResource.driveInfo[i].CurrentUsage + " / " //현재 디스크 사용량
@@ -82,7 +85,7 @@ namespace LucisServiceTest
             resource.CPUInfo = CPUCounter.NextValue().ToString() + "%";
 
             // 4. Memory 사용량
-            resource.MemoryInfo = (MemoryCounter.NextValue() * 1024 * 1024).ToString() + "Bytes";
+            resource.MemoryInfo = MemoryCounter.NextValue().ToString() + " Bytes";
 
             return resource;
         }

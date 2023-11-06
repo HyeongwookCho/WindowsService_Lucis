@@ -38,6 +38,7 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Start Scheduler unit test!");
             fScheduler();            
             Console.ReadLine();
         }
@@ -54,7 +55,7 @@ namespace ConsoleApp1
             ITrigger trigger = TriggerBuilder.Create()
                 .WithIdentity("trigger1", "group1")
                 .StartNow()
-                .WithCronSchedule("0 0/5 * 1/1 * ? *")                
+                .WithCronSchedule("0 0/1 * 1/1 * ? *")                
                 .Build();
 
             await scheduler.ScheduleJob(job, trigger);
