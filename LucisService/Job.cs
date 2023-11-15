@@ -8,7 +8,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static LucisService.Log;
+using static LucisService.SettingFile;
 
 namespace LucisService
 {
@@ -78,7 +78,7 @@ namespace LucisService
                         + "CPUUsageRatio: " + systemResource.CPUInfo + " | " // CPU 사용률
                         + "MemoryUsage: " + systemResource.MemoryInfo + " | " // 메모리 사용량
                         + "StartTime: " + strStartTime); // 수집을 시작한 시간
-                    Log.WriteLog(logMessage);
+                    SettingFile.WriteLog(logMessage);
                 }                
                 return Task.CompletedTask;
             }

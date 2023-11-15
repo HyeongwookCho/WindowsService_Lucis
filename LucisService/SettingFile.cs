@@ -6,16 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using LucisServiceTest;
 
 namespace LucisService
 {
-    class Log
+    class SettingFile
     {
         #region [전역 변수]
         // 설정 파일 경로
         private static readonly string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logconfig.json");
+        private static readonly string observingListFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Setting.ini");
         private static string fileNameFormat = "yyyy-MM-dd_HH";
         private static object lockObj = new object(); // 잠금 객체
+        private static IniFile ini;
         #endregion
 
         #region [Log]
@@ -88,5 +91,26 @@ namespace LucisService
             }
         }
         #endregion
+
+        #region [INI]
+        public static void CreateINI()
+        {
+            ini = new IniFile();
+            ini["Test"]["MyFirstNameis"] = "Hyeongwook";
+            ini["Test"]["MySecondNameis"] = "Cho";
+            ini["TTEst"]["MySecondNameis"] = "Cho";
+            ini.Save(observingListFilePath);
+
+            // ini 읽기
+            ini.Load(observingListFilePath);
+            string topAlways = ini["Test"]["MyFirstNameis"].ToString();
+            string ViewTray = ini["Test"]["MySecondNameis"].ToString();
+            string siewTray = ini["TTEst"]["MySecondNameis"].ToString();
+            Console.WriteLine(topAlways);
+            Console.WriteLine(ViewTray);
+            Console.WriteLine(siewTray);
+        }
+        #endregion
+
     }
 }

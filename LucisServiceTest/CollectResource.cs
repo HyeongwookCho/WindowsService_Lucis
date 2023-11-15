@@ -6,9 +6,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 
 namespace LucisServiceTest
 {
@@ -53,6 +55,27 @@ namespace LucisServiceTest
             Console.WriteLine("==============================================");
             Console.WriteLine("==============================================");
             Console.WriteLine("==============================================");
+
+            Console.WriteLine("=====================================================");
+            Console.WriteLine("======================Process========================");
+            Console.WriteLine("=====================================================");
+
+            Process[] processlist = Process.GetProcesses();
+
+            foreach (Process theprocess in processlist)
+            {
+                Console.WriteLine("Process: {0} ID: {1}", theprocess.ProcessName, theprocess.Id);
+            }
+
+            Console.WriteLine("=====================================================");
+            Console.WriteLine("======================Service========================");
+            Console.WriteLine("=====================================================");
+            ServiceController[] services = ServiceController.GetServices();
+
+            foreach (ServiceController theservice in services)
+            {
+                Console.WriteLine("Service: {0} Status: {1}", theservice.ServiceName, theservice.Status);
+            }
             return Task.CompletedTask;
         }
 

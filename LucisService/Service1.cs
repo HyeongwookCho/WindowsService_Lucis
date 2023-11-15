@@ -33,7 +33,7 @@ namespace LucisService
             try
             {
                 // 시작 시 수집 시작 로그 기록
-                Log.WriteLog($"[{onStartTime.ToString(timeFormat)}] Start Collect System Resource!");
+                SettingFile.WriteLog($"[{onStartTime.ToString(timeFormat)}] Start Collect System Resource!");
                 fScheduler();
             }
             catch (Exception ex)
@@ -48,7 +48,7 @@ namespace LucisService
             try
             {
                 // 중단 시 수집 중단 로그 기록
-                Log.WriteLog($"[{onStopTime.ToString(timeFormat)}] Stop Collect System Resource!");
+                SettingFile.WriteLog($"[{onStopTime.ToString(timeFormat)}] Stop Collect System Resource!");
             }
             catch (Exception ex)
             {
