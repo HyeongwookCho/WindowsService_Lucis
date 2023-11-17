@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Net;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static LucisService.SettingFile;
+using static LucisService.Log;
 
 namespace LucisService
 {
@@ -34,6 +36,7 @@ namespace LucisService
         #region [전역변수]
         protected PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         protected PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Committed Bytes");
+        protected string observingListFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ObservingList.ini");
         #endregion
 
 
@@ -63,13 +66,16 @@ namespace LucisService
                 string strStartTime = startTime.ToString(timeFormat);
                 SystemResource systemResource = new SystemResource();
                 systemResource = GetSystemResource();
+                string ObservingListStatus = GetObservingListStatus();
 
+                // =============수집 리소스 기록=============
                 DateTime loggingTime = DateTime.Now;
                 string strLoggingTime = loggingTime.ToString(timeFormat);
-
+                Log.WriteLog("===================== SYSTEM RESOURCE ===========================");
                 for (int i = 0; i < systemResource.driveInfo.Count; i++)
                 {
-                    string logMessage = ($"[{strLoggingTime}]" // 로그 기록 시간
+                    string logMessage = (
+                        $"[{strLoggingTime}]" // 로그 기록 시간
                         + "ServerHostName: " + systemResource.ServerName + " | "
                         + "DriveName: " + systemResource.driveInfo[i].Name + " / " // 드라이브명
                         + "TotalDiskSize: " + systemResource.driveInfo[i].TotalSize + " / " // 전체 디스크 크기
@@ -78,8 +84,9 @@ namespace LucisService
                         + "CPUUsageRatio: " + systemResource.CPUInfo + " | " // CPU 사용률
                         + "MemoryUsage: " + systemResource.MemoryInfo + " | " // 메모리 사용량
                         + "StartTime: " + strStartTime); // 수집을 시작한 시간
-                    SettingFile.WriteLog(logMessage);
-                }                
+                    Log.WriteLog(logMessage);
+                }
+                Log.WriteLog(ObservingListStatus);
                 return Task.CompletedTask;
             }
             catch (Exception ex)
@@ -130,6 +137,52 @@ namespace LucisService
                 throw;
             }
         }
+        #endregion
+
+        #region [Observing program/service app status]
+
+        private string GetObservingListStatus()
+        {
+            IniFile Ini = new IniFile();
+            StringBuilder sb = new StringBuilder();
+
+            Ini.Load(observingListFilePath);
+
+            sb.AppendLine("==============PROGRAM STATUS==================");
+            foreach (var key in Ini["Program_Obeserving_List"].Keys)
+            {
+                string processName = Ini["Program_Obeserving_List"][key].ToString();
+
+                Process[] processes = Process.GetProcessesByName(processName);                
+                if (processes.Length == 0)
+                {
+                    sb.AppendLine($"{processName} : Dead");
+                    Process.Start(processName);
+                }
+                else
+                {
+                    sb.AppendLine($"{processName} : Alive");
+                }
+            }
+            sb.AppendLine("==============SERVICE STATUS==================");
+            foreach (var key in Ini["Service_Obeserving_List"].Keys)
+            {
+                ServiceController service = new ServiceController(Ini["Service_Obeserving_List"][key].ToString());                
+
+                if (service.Status.ToString().Equals("Stopped") || service.Status.ToString().Equals("Paused"))
+                {
+                    sb.Append($"{service.ServiceName} : Dead");                    
+                    service.Start();
+                    sb.AppendLine(" => reexecute success");
+                }
+                else
+                {
+                    sb.AppendLine($"{service.ServiceName} : Alive");
+                }
+            }
+            return sb.ToString();
+        }
+
         #endregion
     }
 }

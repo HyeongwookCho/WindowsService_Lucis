@@ -10,15 +10,13 @@ using LucisServiceTest;
 
 namespace LucisService
 {
-    class SettingFile
+    class Log
     {
         #region [전역 변수]
         // 설정 파일 경로
-        private static readonly string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logconfig.json");
-        private static readonly string observingListFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Setting.ini");
+        private static readonly string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logconfig.json");        
         private static string fileNameFormat = "yyyy-MM-dd_HH";
         private static object lockObj = new object(); // 잠금 객체
-        private static IniFile ini;
         #endregion
 
         #region [Log]
@@ -30,7 +28,7 @@ namespace LucisService
                 DateTime logFileNameTime = DateTime.Now;
                 string logFileName = logFileNameTime.ToString(fileNameFormat);
                 string filepath = logFileName + ".dat";
-                string directoryPath = Path.Combine(GetDirectoryPathFromConfig(), "SystemResourceLog");
+                string directoryPath = Path.Combine(GetDirectoryPathFromConfig(), "LucisService_Log");
                 string fullFilePath = Path.Combine(directoryPath, filepath);
 
                 if (!Directory.Exists(directoryPath))
@@ -54,7 +52,7 @@ namespace LucisService
         }
         #endregion
 
-        #region [create / read config&directory path]
+        #region [create / read config & directory path]
         private static string GetDirectoryPathFromConfig()
         {
             try
@@ -90,27 +88,7 @@ namespace LucisService
                 throw;
             }
         }
-        #endregion
-
-        #region [INI]
-        public static void CreateINI()
-        {
-            ini = new IniFile();
-            ini["Test"]["MyFirstNameis"] = "Hyeongwook";
-            ini["Test"]["MySecondNameis"] = "Cho";
-            ini["TTEst"]["MySecondNameis"] = "Cho";
-            ini.Save(observingListFilePath);
-
-            // ini 읽기
-            ini.Load(observingListFilePath);
-            string topAlways = ini["Test"]["MyFirstNameis"].ToString();
-            string ViewTray = ini["Test"]["MySecondNameis"].ToString();
-            string siewTray = ini["TTEst"]["MySecondNameis"].ToString();
-            Console.WriteLine(topAlways);
-            Console.WriteLine(ViewTray);
-            Console.WriteLine(siewTray);
-        }
-        #endregion
+        #endregion        
 
     }
 }

@@ -33,7 +33,7 @@ namespace LucisService
             try
             {
                 // 시작 시 수집 시작 로그 기록
-                SettingFile.WriteLog($"[{onStartTime.ToString(timeFormat)}] Start Collect System Resource!");
+                Log.WriteLog($"[{onStartTime.ToString(timeFormat)}] Start Collect System Resource!");
                 fScheduler();
             }
             catch (Exception ex)
@@ -48,7 +48,7 @@ namespace LucisService
             try
             {
                 // 중단 시 수집 중단 로그 기록
-                SettingFile.WriteLog($"[{onStopTime.ToString(timeFormat)}] Stop Collect System Resource!");
+                Log.WriteLog($"[{onStopTime.ToString(timeFormat)}] Stop Collect System Resource!");
             }
             catch (Exception ex)
             {
@@ -72,7 +72,7 @@ namespace LucisService
                 ITrigger trigger = TriggerBuilder.Create()
                     .WithIdentity("trigger1", "group1")
                     .StartNow()
-                    .WithCronSchedule("0 0/5 * 1/1 * ? *")
+                    .WithCronSchedule("0 0/1 * 1/1 * ? *")
                     .Build();
 
                 await scheduler.ScheduleJob(job, trigger);

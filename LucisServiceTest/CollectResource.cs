@@ -18,7 +18,7 @@ namespace LucisServiceTest
     {
         protected static PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         protected static PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Committed Bytes");
-
+        protected static string observingListFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ObservingList.ini");
         public async Task Execute(IJobExecutionContext context)
         {
             await PrintResource();
@@ -56,7 +56,50 @@ namespace LucisServiceTest
             Console.WriteLine("==============================================");
             Console.WriteLine("==============================================");
 
-            Console.WriteLine("=====================================================");
+            
+
+            IniFile IniTest = new IniFile();
+
+            IniTest.Load(observingListFilePath);
+
+            foreach (var key in IniTest["Program_Obeserving_List"].Keys)
+            {
+                string processName = key.ToString();
+                string processPath = IniTest["Program_Obeserving_List"][key].ToString();
+
+                Process[] processes = Process.GetProcessesByName(IniTest["Program_Obeserving_List"][key].ToString());
+                Console.WriteLine("============================");
+                Console.WriteLine("processName : {0}",processName);
+                Console.WriteLine("processPath : {0}", processPath);
+                if (processes.Length == 0)
+                {
+                    Console.WriteLine($"{IniTest["Program_Obeserving_List"][key]} is Not running");
+                    Process.Start(IniTest["Program_Obeserving_List"][key].ToString());
+                }
+                else
+                {
+                    Console.WriteLine($"{IniTest["Program_Obeserving_List"][key]} is Running");
+                }
+            }
+            Console.WriteLine();
+            foreach (var key in IniTest["Service_Obeserving_List"].Keys)
+            {
+                ServiceController service = new ServiceController(IniTest["Service_Obeserving_List"][key].ToString());
+                Console.WriteLine("=============SERVICE STATUS TEST===============");
+
+                if (service.Status.ToString().Equals("Stopped") || service.Status.ToString().Equals("Paused"))
+                {
+                    Console.WriteLine($"{service.ServiceName} is {service.Status}");
+                    service.Start();
+                    Console.WriteLine($"restart {service.ServiceName}");
+                }
+                else
+                {
+                    Console.WriteLine($"{service.ServiceName} is {service.Status}");
+                }
+            }
+
+            /*Console.WriteLine("=====================================================");
             Console.WriteLine("======================Process========================");
             Console.WriteLine("=====================================================");
 
@@ -75,7 +118,7 @@ namespace LucisServiceTest
             foreach (ServiceController theservice in services)
             {
                 Console.WriteLine("Service: {0} Status: {1}", theservice.ServiceName, theservice.Status);
-            }
+            }*/
             return Task.CompletedTask;
         }
 

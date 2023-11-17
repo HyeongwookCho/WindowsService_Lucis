@@ -39,36 +39,7 @@ namespace ConsoleApp1
         #endregion
 
         static void Main(string[] args)
-        {
-            // ini Test
-            string observingListFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ObservingList.ini");
-
-            IniFile ini = new IniFile();
-            ini["Obeserving_List"]["Program"] = "notepad";
-            ini["Obeserving_List"]["List"] = "mspaint";
-            ini["Obeserving_List"]["Service"] = "lucisservice";
-            ini["Obeserving_List"]["Service1"] = "wmplayer";
-            ini["Obeserving_List"]["Service2"] = "powershell";
-            ini.Save(observingListFilePath);
-            
-            ini.Load(observingListFilePath);
-                        
-            foreach (var key in ini["Obeserving_List"].Keys)
-            {
-                Process[] processes = Process.GetProcessesByName(ini["Obeserving_List"][key].ToString());
-                Console.WriteLine("============================");
-                if (processes.Length == 0)
-                {
-                    Console.WriteLine($"{ini["Obeserving_List"][key]} is Not running");
-                    Process.Start(ini["Obeserving_List"][key].ToString());
-                }
-                else
-                {
-                    Console.WriteLine($"{ini["Obeserving_List"][key]} is Running");
-                }                
-            }
-
-
+        {            
             fScheduler();
             Console.ReadLine();
         }
