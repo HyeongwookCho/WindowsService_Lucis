@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using LucisServiceTest;
 
 namespace LucisService
 {
@@ -64,7 +59,7 @@ namespace LucisService
                 string json = File.ReadAllText(configFilePath);
                 return JsonConvert.DeserializeObject<string>(json);
             }
-            catch (Exception ex)
+            catch (Exception ex)    
             {
                 EventLog.WriteEntry("LucisService", ex.Message, EventLogEntryType.Error);
                 throw;

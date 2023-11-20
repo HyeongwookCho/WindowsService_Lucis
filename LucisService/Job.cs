@@ -37,6 +37,7 @@ namespace LucisService
         protected PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         protected PerformanceCounter MemoryCounter = new PerformanceCounter("Memory", "Committed Bytes");
         protected string observingListFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ObservingList.ini");
+        
         #endregion
 
 
@@ -60,10 +61,10 @@ namespace LucisService
             try
             {
                 // =============리소스 수집 시작=============
-                DateTime startTime = DateTime.Now;
+                DateTime startTime = DateTime.Now;                
                 string timeFormat = "yyyy-MM-dd HH.mm.ss.fff";
-
                 string strStartTime = startTime.ToString(timeFormat);
+
                 SystemResource systemResource = new SystemResource();
                 systemResource = GetSystemResource();
                 string ObservingListStatus = GetObservingListStatus();
@@ -127,7 +128,7 @@ namespace LucisService
                 resource.CPUInfo = CPUCounter.NextValue().ToString() + "%";
 
                 // 4. Memory 사용량
-                resource.MemoryInfo = MemoryCounter.NextValue().ToString() + " Bytes";
+                resource.MemoryInfo = MemoryCounter.NextValue().ToString() + " Bytes"; 
 
                 return resource;
             }
@@ -139,7 +140,7 @@ namespace LucisService
         }
         #endregion
 
-        #region [Observing program/service app status]
+        #region [Observing program&service app status]
 
         private string GetObservingListStatus()
         {
@@ -151,33 +152,36 @@ namespace LucisService
             sb.AppendLine("==============PROGRAM STATUS==================");
             foreach (var key in Ini["Program_Obeserving_List"].Keys)
             {
-                string processName = Ini["Program_Obeserving_List"][key].ToString();
+                string processPath = Ini["Program_Obeserving_List"][key].ToString();
+                string processName = Path.GetFileNameWithoutExtension(processPath);
 
-                Process[] processes = Process.GetProcessesByName(processName);                
+                Process[] processes = Process.GetProcessesByName(processName);
+                string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss.fff");
                 if (processes.Length == 0)
                 {
-                    sb.AppendLine($"{processName} : Dead");
+                    sb.Append($"[{currentTime}] {processName} : Dead");
                     Process.Start(processName);
+                    sb.AppendLine(" => reexecute success");
                 }
                 else
                 {
-                    sb.AppendLine($"{processName} : Alive");
+                    sb.AppendLine($"[{currentTime}] {processName} : Alive");
                 }
             }
             sb.AppendLine("==============SERVICE STATUS==================");
             foreach (var key in Ini["Service_Obeserving_List"].Keys)
             {
-                ServiceController service = new ServiceController(Ini["Service_Obeserving_List"][key].ToString());                
-
+                ServiceController service = new ServiceController(Ini["Service_Obeserving_List"][key].ToString());
+                string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss.fff");
                 if (service.Status.ToString().Equals("Stopped") || service.Status.ToString().Equals("Paused"))
                 {
-                    sb.Append($"{service.ServiceName} : Dead");                    
+                    sb.Append($"[{currentTime}] {service.ServiceName} : Dead");
                     service.Start();
                     sb.AppendLine(" => reexecute success");
                 }
                 else
                 {
-                    sb.AppendLine($"{service.ServiceName} : Alive");
+                    sb.AppendLine($"[{currentTime}] {service.ServiceName} : Alive");
                 }
             }
             return sb.ToString();
