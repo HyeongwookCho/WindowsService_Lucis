@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Diagnostics;
 
@@ -13,7 +9,7 @@ namespace LucisService
     {
         #region [전역 변수]
         // 설정 파일 경로
-        private static readonly string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logconfig.json");
+        private static readonly string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logconfig.json");        
         private static string fileNameFormat = "yyyy-MM-dd_HH";
         private static object lockObj = new object(); // 잠금 객체
         #endregion
@@ -27,7 +23,7 @@ namespace LucisService
                 DateTime logFileNameTime = DateTime.Now;
                 string logFileName = logFileNameTime.ToString(fileNameFormat);
                 string filepath = logFileName + ".dat";
-                string directoryPath = Path.Combine(GetDirectoryPathFromConfig(), "SystemResourceLog");
+                string directoryPath = Path.Combine(GetDirectoryPathFromConfig(), "LucisService_Log");
                 string fullFilePath = Path.Combine(directoryPath, filepath);
 
                 if (!Directory.Exists(directoryPath))
@@ -51,20 +47,19 @@ namespace LucisService
         }
         #endregion
 
-        #region [create / read config&directory path]
-        #region [create / read config&directory path]
+        #region [create / read config & directory path]
         private static string GetDirectoryPathFromConfig()
         {
             try
             {
                 if (!File.Exists(configFilePath))
                 {
-                    File.WriteAllText(configFilePath, JsonConvert.SerializeObject(DefaultDirectory()));
+                    File.WriteAllText(configFilePath, JsonConvert.SerializeObject(GetDefaultDrive()));
                 }
                 string json = File.ReadAllText(configFilePath);
                 return JsonConvert.DeserializeObject<string>(json);
             }
-            catch (Exception ex)
+            catch (Exception ex)    
             {
                 EventLog.WriteEntry("LucisService", ex.Message, EventLogEntryType.Error);
                 throw;
@@ -88,18 +83,7 @@ namespace LucisService
                 throw;
             }
         }
-        #endregion
+        #endregion        
 
-        private static string DefaultDirectory()
-        {
-            DirectoryInfo directoryInfo = new DirectoryInfo(GetDefaultDrive());
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
-            return directoryInfo.FullName;
-        }
-        #endregion
     }
 }
